@@ -1,36 +1,43 @@
 import { useEffect, useState } from "react";
 import { Menu, X } from "lucide-react";
-import { menuItems } from "../../constants";
-import { useTheme } from "../../hooks/useTheme";
 
-import { fetchSocials } from "../../services/publicDataService.js";
+import { useTheme } from "../../hooks/useTheme";
 import { iconMap } from "../../utils/iconMap.js";
 import { FaGlobe } from "react-icons/fa";
 
-const Navbar = () => {
+const Navbar = ({ socials, about }) => {
+  const menuItems = [
+    {
+      id: "about",
+      title: "About",
+    },
+    {
+      id: "skills",
+      title: "Skills",
+    },
+    {
+      id: "experience",
+      title: "Experience",
+    },
+    {
+      id: "projects",
+      title: "Projects",
+    },
+    {
+      id: "education",
+      title: "Education",
+    },
+  ];
+
   const [isOpen, setIsOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("");
   const [isScrolled, setIsScrolled] = useState(false);
   const { theme, toggleTheme } = useTheme();
-  const [socials, setSocials] = useState([]);
-  const [loading, setLoading] = useState(true);
 
-  const loadSocials = async () => {
-    try {
-      const data = await fetchSocials();
-      const activeSocials = data.data.filter((item) => item.isActive);
-      setSocials(activeSocials);
-    } catch (error) {
-      console.error("Error fetching socials", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    loadSocials();
-  }, []);
-  console.log(socials);
+  // Split the name
+  const nameParts = about?.name?.split(" ") || ["FirstName", "LastName"];
+  const firstName = nameParts[0];
+  const lastName = nameParts.slice(1).join(" ");
 
   useEffect(() => {
     const handleScroll = () => {
@@ -62,11 +69,11 @@ const Navbar = () => {
         <div className="text-lg sm:text-xl font-serif cursor-pointer select-none">
           <span className="text-blue-600 dark:text-[#8245ec]">&lt;</span>
           <span className="text-gray-900 dark:text-white font-medium">
-            Mahesh
+            {firstName}
           </span>
           <span className="text-blue-600 dark:text-[#8245ec]">/</span>
           <span className="text-gray-900 dark:text-white font-medium">
-            Hattimare
+            {lastName}
           </span>
           <span className="text-blue-600 dark:text-[#8245ec]">&gt;</span>
         </div>
@@ -92,7 +99,7 @@ const Navbar = () => {
           ))}
         </ul>
 
-        {/* Theme Toggle Button */}
+        {/* Theme Toggle Button & Socials */}
         <div className="hidden md:flex items-center space-x-4">
           <button
             onClick={toggleTheme}
@@ -130,7 +137,7 @@ const Navbar = () => {
 
           {/* Social Media Icons */}
           <div className="flex space-x-3">
-            {socials
+            {(socials?.data || [])
               .filter((social) =>
                 ["github", "linkedin"].includes(social.name.toLowerCase())
               )
@@ -153,7 +160,6 @@ const Navbar = () => {
 
         {/* Mobile Menu Icon and Theme Toggle */}
         <div className="md:hidden flex items-center space-x-3">
-          {/* Mobile Theme Toggle */}
           <button
             onClick={toggleTheme}
             className="relative w-12 h-7 bg-gray-200 dark:bg-gray-700 rounded-full transition-colors duration-300 focus:outline-none"
@@ -188,7 +194,6 @@ const Navbar = () => {
             </div>
           </button>
 
-          {/* Mobile Menu Toggle */}
           {isOpen ? (
             <X
               className="w-7 h-7 text-blue-600 dark:text-[#8245ec] cursor-pointer transition-transform duration-200 hover:scale-110"
@@ -225,7 +230,7 @@ const Navbar = () => {
               </li>
             ))}
             <div className="flex space-x-6 pt-4 border-t border-gray-200 dark:border-gray-700 mt-4 w-full justify-center">
-              {socials
+              {(socials?.data || [])
                 .filter((social) =>
                   ["github", "linkedin"].includes(social.name.toLowerCase())
                 )

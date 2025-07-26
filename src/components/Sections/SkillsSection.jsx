@@ -1,30 +1,7 @@
-import { useEffect, useState } from "react";
 import { Code, Sparkles } from "lucide-react";
 import Tilt from "react-parallax-tilt";
-import { fetchSkills } from "../../services/publicDataService";
 
-const SkillsSection = () => {
-  const [skills, setSkills] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  // ✅ Fetch skills on mount
-  const loadSkills = async () => {
-    try {
-      setLoading(true);
-      const data = await fetchSkills(); // Ensure this returns res.data
-      setSkills(data);
-    } catch (error) {
-      // ✅ FIXED: corrected variable name from 'err' to 'error'
-      console.error("Error fetching skills:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    loadSkills();
-  }, []);
-
+const SkillsSection = ({ skills }) => {
   return (
     <section
       id="skills"
@@ -67,18 +44,10 @@ const SkillsSection = () => {
           </p>
         </div>
 
-        {/* ✅ Added error/fallback UI */}
-        {!loading && skills.length === 0 && (
-          <p className="text-center text-red-500 mb-6">
-            Failed to load skills. Please try again later.
-          </p>
-        )}
-
         {/* Skill Categories */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
-          {skills.map((category, index) => (
+          {(skills || []).map((category, index) => (
             <div
-              // ✅ FIXED misleading use of "_id" for index
               key={category._id || index}
               className="group bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg px-6 sm:px-8 py-8 rounded-3xl border border-gray-200/50 dark:border-white/10 shadow-lg hover:shadow-2xl dark:shadow-[0_0_30px_rgba(130,69,236,0.2)] transition-all duration-500 hover:-translate-y-2"
             >
@@ -95,9 +64,8 @@ const SkillsSection = () => {
                 gyroscope={true}
               >
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
-                  {category.entries.map((skill, idx) => (
+                  {(category.entries || []).map((skill, idx) => (
                     <div
-                      // ✅ FIXED: changed confusing '_id' use, fallback to index
                       key={skill._id || idx}
                       className="flex items-center justify-center gap-2 bg-gray-100 dark:bg-gray-800/70 border border-gray-200 dark:border-gray-700/50 rounded-2xl py-3 px-3 sm:px-4 hover:bg-blue-50 dark:hover:bg-gray-700/70 hover:border-blue-200 dark:hover:border-[#8245ec]/30 hover:scale-105 transition-all duration-300 group/skill"
                       style={{

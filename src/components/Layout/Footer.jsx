@@ -4,26 +4,7 @@ import { useEffect, useState } from "react";
 import { iconMap } from "../../utils/iconMap.js";
 import { FaGlobe } from "react-icons/fa";
 
-const Footer = () => {
-  const [socials, setSocials] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  const loadSocials = async () => {
-    try {
-      const data = await fetchSocials();
-      const activeSocials = data.data.filter((item) => item.isActive);
-      setSocials(activeSocials);
-    } catch (error) {
-      console.error("Error fetching socials", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    loadSocials();
-  }, []);
-
+const Footer = ({ socials, about }) => {
   const handleScroll = (sectionId) => {
     const section = document.getElementById(sectionId);
     if (section) {
@@ -54,7 +35,7 @@ const Footer = () => {
         <div className="text-center space-y-8">
           <div>
             <h2 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 dark:from-[#8245ec] dark:to-purple-400 bg-clip-text text-transparent mb-2">
-              Mahesh Hattimare
+              {about.name}
             </h2>
             <p className="text-gray-600 dark:text-gray-400 text-sm sm:text-base font-medium">
               Full Stack Developer & Tech Enthusiast
@@ -63,7 +44,7 @@ const Footer = () => {
 
           {/* Navigation links using social names */}
           <nav className="flex flex-wrap justify-center gap-4 sm:gap-6">
-            {socials.map((social, index) => (
+            {socials?.data.map((social, index) => (
               <button
                 key={social._id || index}
                 onClick={() => handleScroll(social.name.toLowerCase())}
@@ -77,7 +58,7 @@ const Footer = () => {
 
           {/* Social Icons */}
           <div className="flex justify-center gap-4 sm:gap-6">
-            {socials.map((social, index) => {
+            {socials?.data.map((social, index) => {
               const Icon = iconMap[social.icon] || FaGlobe;
               return (
                 <a

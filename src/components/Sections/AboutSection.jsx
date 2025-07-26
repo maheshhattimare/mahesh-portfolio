@@ -1,28 +1,8 @@
 import { Typewriter } from "react-simple-typewriter";
 import Tilt from "react-parallax-tilt";
 import { Download, MessageCircle } from "lucide-react";
-import { fetchAbout } from "../../services/publicDataService";
-import { useEffect, useState } from "react";
 
-const AboutSection = () => {
-  const [about, setAbout] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  const loadAbout = async () => {
-    try {
-      const data = await fetchAbout();
-      setAbout(data);
-    } catch (error) {
-      console.error("Error fetching about", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    loadAbout();
-  }, []);
-
+const AboutSection = ({ about }) => {
   return (
     <section
       id="about"
@@ -36,7 +16,7 @@ const AboutSection = () => {
             <h1 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold text-gray-900 dark:text-white mb-6 leading-tight">
               Hi, I'm{" "}
               <span className="bg-gradient-to-r from-blue-600 to-purple-600 dark:from-[#8245ec] dark:to-purple-400 bg-clip-text text-transparent">
-                {about.name}
+                {about?.name}
               </span>
             </h1>
 
@@ -47,12 +27,7 @@ const AboutSection = () => {
               </span>
               <span className="text-blue-600 dark:text-[#8245ec]">
                 <Typewriter
-                  words={[
-                    "Fullstack Developer",
-                    "MERN Stack Developer",
-                    "Tech Enthusiast",
-                    "Coder",
-                  ]}
+                  words={about?.titles || []}
                   loop={0}
                   cursor
                   cursorStyle="_"
@@ -65,13 +40,13 @@ const AboutSection = () => {
 
             {/* About Me Paragraph */}
             <p className="text-base sm:text-lg lg:text-xl text-gray-600 dark:text-gray-400 mb-10 leading-relaxed max-w-2xl">
-              {about.description}
+              {about?.description}
             </p>
 
             <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 sm:gap-6">
               {/* Download CV */}
               <a
-                href={about ? about.resumeUrl : "#"}
+                href={about?.resumeUrl || "#"}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="group inline-flex items-center gap-2 text-white py-3 px-6 sm:px-8 rounded-full text-base sm:text-lg font-semibold transition-all duration-300 transform hover:scale-105 bg-gradient-to-r from-blue-600 to-purple-600 dark:from-[#8245ec] dark:to-purple-400 shadow-lg hover:shadow-xl hover:shadow-blue-500/25 dark:hover:shadow-purple-500/25"
@@ -114,8 +89,8 @@ const AboutSection = () => {
 
                 {/* Profile image */}
                 <img
-                  src={about.avatarUrl}
-                  alt={about.name}
+                  src={about?.avatarUrl}
+                  alt={about?.name}
                   className="absolute inset-2 w-[calc(100%-16px)] h-[calc(100%-16px)] rounded-full object-cover shadow-2xl"
                 />
 

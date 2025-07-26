@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useState, useMemo } from "react";
 import {
   Folder,
   Github,
@@ -8,29 +8,16 @@ import {
   Eye,
   Star,
 } from "lucide-react";
-import { fetchProjects } from "../../services/publicDataService.js";
 
-const WorkSection = () => {
+const WorkSection = ({ projects }) => {
   const [selectedProject, setSelectedProject] = useState(null);
-  const [projects, setProjects] = useState([]);
-  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const loadProjects = async () => {
-      try {
-        const data = await fetchProjects();
-        // Sort featured projects first
-        const sorted = data.sort((a, b) => b.isFeatured - a.isFeatured);
-        setProjects(sorted);
-      } catch (error) {
-        console.error("Error fetching projects:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
+  // useMemo is used to sort the projects only when the projects prop changes.
+  const sortedProjects = useMemo(() => {
+    if (!projects) return [];
 
-    loadProjects();
-  }, []);
+    return [...projects].sort((a, b) => b.isFeatured - a.isFeatured);
+  }, [projects]);
 
   const handleOpenModal = (project) => setSelectedProject(project);
   const handleCloseModal = () => setSelectedProject(null);
@@ -86,9 +73,9 @@ const WorkSection = () => {
           </p>
         </div>
 
-        {/* Projects Grid */}
+        {/* Projects Grid - Now maps over the sortedProjects memoized value */}
         <div className="grid gap-6 lg:gap-8 grid-cols-1 md:grid-cols-2 xl:grid-cols-3">
-          {projects.map((project, index) => (
+          {sortedProjects.map((project, index) => (
             <div
               key={project._id || index}
               onClick={() => handleOpenModal(project)}
@@ -168,72 +155,70 @@ const WorkSection = () => {
               </div>
 
               <div className="overflow-y-auto max-h-[90vh]">
-                <div className="overflow-y-auto max-h-[90vh]">
-                  <div className="bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 p-6 sm:p-8">
-                    <img
-                      src={selectedProject.imageUrl}
-                      alt={selectedProject.title}
-                      className="w-full max-h-80 object-contain rounded-2xl shadow-lg"
-                    />
+                <div className="bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 p-6 sm:p-8">
+                  <img
+                    src={selectedProject.imageUrl}
+                    alt={selectedProject.title}
+                    className="w-full max-h-80 object-contain rounded-2xl shadow-lg"
+                  />
+                </div>
+
+                <div className="p-6 sm:p-8">
+                  <h3 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white mb-4">
+                    {selectedProject.title}
+                  </h3>
+
+                  <p className="text-gray-600 dark:text-gray-400 mb-6 text-base sm:text-lg leading-relaxed">
+                    {selectedProject.description}
+                  </p>
+
+                  <div className="mb-6">
+                    <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">
+                      Technologies Used:
+                    </h4>
+                    <div className="flex flex-wrap gap-2">
+                      {(selectedProject.technologies || []).map(
+                        (tech, index) => (
+                          <span
+                            key={index}
+                            className="bg-blue-100 dark:bg-[#8245ec]/20 text-blue-800 dark:text-[#8245ec] text-sm font-medium rounded-full px-3 py-1 border border-blue-200 dark:border-[#8245ec]/30"
+                          >
+                            {tech}
+                          </span>
+                        )
+                      )}
+                    </div>
                   </div>
 
-                  <div className="p-6 sm:p-8">
-                    <h3 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white mb-4">
-                      {selectedProject.title}
-                    </h3>
-
-                    <p className="text-gray-600 dark:text-gray-400 mb-6 text-base sm:text-lg leading-relaxed">
-                      {selectedProject.description}
+                  <div className="mb-6">
+                    <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                      Project Duration:
+                    </h4>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                      {formatDate(selectedProject.startDate)} —{" "}
+                      {formatDate(selectedProject.endDate)}
                     </p>
+                  </div>
 
-                    <div className="mb-6">
-                      <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">
-                        Technologies Used:
-                      </h4>
-                      <div className="flex flex-wrap gap-2">
-                        {(selectedProject.technologies || []).map(
-                          (tech, index) => (
-                            <span
-                              key={index}
-                              className="bg-blue-100 dark:bg-[#8245ec]/20 text-blue-800 dark:text-[#8245ec] text-sm font-medium rounded-full px-3 py-1 border border-blue-200 dark:border-[#8245ec]/30"
-                            >
-                              {tech}
-                            </span>
-                          )
-                        )}
-                      </div>
-                    </div>
-
-                    <div className="mb-6">
-                      <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                        Project Duration:
-                      </h4>
-                      <p className="text-sm text-gray-500 dark:text-gray-400">
-                        {formatDate(selectedProject.startDate)} —{" "}
-                        {formatDate(selectedProject.endDate)}
-                      </p>
-                    </div>
-
-                    <div className="flex flex-col sm:flex-row gap-4">
-                      <a
-                        href={selectedProject.githubLink}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex-1 group bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 px-6 py-3 rounded-2xl font-semibold text-center transition-all duration-300 hover:scale-105 flex items-center justify-center gap-2"
-                      >
-                        <Github className="w-5 h-5 group-hover:animate-pulse" />
-                        View Code
-                      </a>
-                      <a
-                        href={selectedProject.projectLink}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex-1 group bg-gradient-to-r from-blue-600 to-purple-600 dark:from-[#8245ec] dark:to-purple-400 hover:from-blue-700 hover:to-purple-700 dark:hover:from-[#7c3aed] dark:hover:to-purple-500 text-white px-6 py-3 rounded-2xl font-semibold text-center transition-all duration-300 hover:scale-105 flex items-center justify-center gap-2 shadow-lg hover:shadow-xl"
-                      >
-                        <ExternalLink className="w-5 h-5 group-hover:animate-bounce" />
-                        View Live
-                      </a>
-                    </div>
+                  <div className="flex flex-col sm:flex-row gap-4">
+                    <a
+                      href={selectedProject.githubLink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex-1 group bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 px-6 py-3 rounded-2xl font-semibold text-center transition-all duration-300 hover:scale-105 flex items-center justify-center gap-2"
+                    >
+                      <Github className="w-5 h-5 group-hover:animate-pulse" />
+                      View Code
+                    </a>
+                    <a
+                      href={selectedProject.projectLink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex-1 group bg-gradient-to-r from-blue-600 to-purple-600 dark:from-[#8245ec] dark:to-purple-400 hover:from-blue-700 hover:to-purple-700 dark:hover:from-[#7c3aed] dark:hover:to-purple-500 text-white px-6 py-3 rounded-2xl font-semibold text-center transition-all duration-300 hover:scale-105 flex items-center justify-center gap-2 shadow-lg hover:shadow-xl"
+                    >
+                      <ExternalLink className="w-5 h-5 group-hover:animate-bounce" />
+                      View Live
+                    </a>
                   </div>
                 </div>
               </div>

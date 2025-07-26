@@ -56,24 +56,26 @@ export const fetchEducation = async () => {
   }
 };
 
-// GET: Contact details (if public)
-export const fetchContact = async () => {
-  try {
-    const res = await API.get("/contact");
-    return res.data;
-  } catch (error) {
-    console.error("Error fetching contact:", error);
-    throw error;
-  }
-};
-
 // GET: Social links (e.g., GitHub, Twitter, etc.)
 export const fetchSocials = async () => {
   try {
     const res = await API.get("/social");
-    return res.data; // ✅ return the actual array
+    return res.data;
   } catch (error) {
     console.error("Error fetching social:", error);
     throw error;
   }
+};
+
+// ✅ NEW: Function to fetch all data in parallel
+export const fetchAllPortfolioData = () => {
+  // Returns a single promise that resolves when all fetches are complete
+  return Promise.all([
+    fetchAbout(),
+    fetchSkills(),
+    fetchProjects(),
+    fetchExperiences(),
+    fetchEducation(),
+    fetchSocials(),
+  ]);
 };
