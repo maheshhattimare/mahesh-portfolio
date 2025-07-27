@@ -1,32 +1,21 @@
 import { useEffect, useState } from "react";
 import { Menu, X } from "lucide-react";
+import { useLocation } from "react-router-dom";
 
 import { useTheme } from "../../hooks/useTheme";
 import { iconMap } from "../../utils/iconMap.js";
 import { FaGlobe } from "react-icons/fa";
 
 const Navbar = ({ socials, about }) => {
+  const location = useLocation();
+  const isProjectsPage = location.pathname === "/projects";
+
   const menuItems = [
-    {
-      id: "about",
-      title: "About",
-    },
-    {
-      id: "skills",
-      title: "Skills",
-    },
-    {
-      id: "experience",
-      title: "Experience",
-    },
-    {
-      id: "projects",
-      title: "Projects",
-    },
-    {
-      id: "education",
-      title: "Education",
-    },
+    { id: "about", title: "About" },
+    { id: "skills", title: "Skills" },
+    { id: "experience", title: "Experience" },
+    { id: "projects", title: "Projects" },
+    { id: "education", title: "Education" },
   ];
 
   const [isOpen, setIsOpen] = useState(false);
@@ -34,15 +23,12 @@ const Navbar = ({ socials, about }) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const { theme, toggleTheme } = useTheme();
 
-  // Split the name
   const nameParts = about?.name?.split(" ") || ["FirstName", "LastName"];
   const firstName = nameParts[0];
   const lastName = nameParts.slice(1).join(" ");
 
   useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50);
-    };
+    const handleScroll = () => setIsScrolled(window.scrollY > 50);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
@@ -50,7 +36,6 @@ const Navbar = ({ socials, about }) => {
   const handleMenuItemClick = (sectionId) => {
     setActiveSection(sectionId);
     setIsOpen(false);
-
     const section = document.getElementById(sectionId);
     if (section) {
       section.scrollIntoView({ behavior: "smooth" });
@@ -66,40 +51,44 @@ const Navbar = ({ socials, about }) => {
       }`}
     >
       <div className="text-gray-900 dark:text-white py-4 sm:py-5 flex justify-between items-center max-w-7xl mx-auto">
-        <div className="text-lg sm:text-xl font-serif cursor-pointer select-none">
-          <span className="text-blue-600 dark:text-[#8245ec]">&lt;</span>
-          <span className="text-gray-900 dark:text-white font-medium">
-            {firstName}
-          </span>
-          <span className="text-blue-600 dark:text-[#8245ec]">/</span>
-          <span className="text-gray-900 dark:text-white font-medium">
-            {lastName}
-          </span>
-          <span className="text-blue-600 dark:text-[#8245ec]">&gt;</span>
-        </div>
+        <a href={isProjectsPage ? "/" : "#"}>
+          <div className="text-lg sm:text-xl font-serif cursor-pointer select-none">
+            <span className="text-blue-600 dark:text-[#8245ec]">&lt;</span>
+            <span className="text-gray-900 dark:text-white font-medium">
+              {firstName}
+            </span>
+            <span className="text-blue-600 dark:text-[#8245ec]">/</span>
+            <span className="text-gray-900 dark:text-white font-medium">
+              {lastName}
+            </span>
+            <span className="text-blue-600 dark:text-[#8245ec]">&gt;</span>
+          </div>
+        </a>
 
-        {/* Desktop Menu */}
-        <ul className="hidden md:flex space-x-6 lg:space-x-8 text-gray-600 dark:text-gray-300">
-          {menuItems.map((item) => (
-            <li
-              key={item.id}
-              className={`cursor-pointer transition-colors duration-200 hover:text-blue-600 dark:hover:text-[#8245ec] font-medium ${
-                activeSection === item.id
-                  ? "text-blue-600 dark:text-[#8245ec]"
-                  : ""
-              }`}
-            >
-              <button
-                onClick={() => handleMenuItemClick(item.id)}
-                className="py-2"
+        {/* Desktop Menu (Hidden on /projects route) */}
+        {!isProjectsPage && (
+          <ul className="hidden md:flex space-x-6 lg:space-x-8 text-gray-600 dark:text-gray-300">
+            {menuItems.map((item) => (
+              <li
+                key={item.id}
+                className={`cursor-pointer transition-colors duration-200 hover:text-blue-600 dark:hover:text-[#8245ec] font-medium ${
+                  activeSection === item.id
+                    ? "text-blue-600 dark:text-[#8245ec]"
+                    : ""
+                }`}
               >
-                {item.title}
-              </button>
-            </li>
-          ))}
-        </ul>
+                <button
+                  onClick={() => handleMenuItemClick(item.id)}
+                  className="py-2"
+                >
+                  {item.title}
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
 
-        {/* Theme Toggle Button & Socials */}
+        {/* Theme Toggle & Socials */}
         <div className="hidden md:flex items-center space-x-4">
           <button
             onClick={toggleTheme}
@@ -135,7 +124,6 @@ const Navbar = ({ socials, about }) => {
             </div>
           </button>
 
-          {/* Social Media Icons */}
           <div className="flex space-x-3">
             {(socials?.data || [])
               .filter((social) =>
@@ -158,7 +146,7 @@ const Navbar = ({ socials, about }) => {
           </div>
         </div>
 
-        {/* Mobile Menu Icon and Theme Toggle */}
+        {/* Mobile Menu Toggle (Hidden on /projects route) */}
         <div className="md:hidden flex items-center space-x-3">
           <button
             onClick={toggleTheme}
@@ -194,22 +182,23 @@ const Navbar = ({ socials, about }) => {
             </div>
           </button>
 
-          {isOpen ? (
-            <X
-              className="w-7 h-7 text-blue-600 dark:text-[#8245ec] cursor-pointer transition-transform duration-200 hover:scale-110"
-              onClick={() => setIsOpen(false)}
-            />
-          ) : (
-            <Menu
-              className="w-7 h-7 text-blue-600 dark:text-[#8245ec] cursor-pointer transition-transform duration-200 hover:scale-110"
-              onClick={() => setIsOpen(true)}
-            />
-          )}
+          {!isProjectsPage &&
+            (isOpen ? (
+              <X
+                className="w-7 h-7 text-blue-600 dark:text-[#8245ec] cursor-pointer transition-transform duration-200 hover:scale-110"
+                onClick={() => setIsOpen(false)}
+              />
+            ) : (
+              <Menu
+                className="w-7 h-7 text-blue-600 dark:text-[#8245ec] cursor-pointer transition-transform duration-200 hover:scale-110"
+                onClick={() => setIsOpen(true)}
+              />
+            ))}
         </div>
       </div>
 
-      {/* Mobile Menu Items */}
-      {isOpen && (
+      {/* Mobile Menu Items (Hidden on /projects route) */}
+      {!isProjectsPage && isOpen && (
         <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-[90%] max-w-sm bg-white/95 dark:bg-[#050414]/95 backdrop-blur-xl z-50 rounded-2xl shadow-2xl border border-gray-200/50 dark:border-gray-800/50 mt-2 md:hidden">
           <ul className="flex flex-col items-center space-y-1 py-6 text-gray-600 dark:text-gray-300">
             {menuItems.map((item) => (

@@ -1,6 +1,4 @@
 import { Heart, ArrowUp } from "lucide-react";
-import { fetchSocials } from "../../services/publicDataService.js";
-import { useEffect, useState } from "react";
 import { iconMap } from "../../utils/iconMap.js";
 import { FaGlobe } from "react-icons/fa";
 

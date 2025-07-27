@@ -6,7 +6,7 @@ import { Mail, User, MessageSquare, Send, Rocket } from "lucide-react";
 import conf from "../../conf/conf";
 
 const ContactSection = () => {
-  const form = useRef(); // This is the reference to the form
+  const form = useRef();
   const [isSent, setIsSent] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -15,22 +15,21 @@ const ContactSection = () => {
     e.preventDefault();
     setIsLoading(true);
 
-    // Ensure we pass the actual DOM form element, not the React reference
     const formElement = form.current;
 
     if (formElement) {
       emailjs
         .sendForm(
-          conf.emailjsServiceId, // EmailJS Service ID
-          conf.emailjsTemplateId, // EmailJS Template ID
-          formElement, // Actual form DOM element
-          conf.emailjsPublicKey // EmailJS Public Key
+          conf.emailjsServiceId,
+          conf.emailjsTemplateId,
+          formElement,
+          conf.emailjsPublicKey
         )
         .then(
           () => {
             setIsSent(true);
             setIsLoading(false);
-            formElement.reset(); // Reset form on success
+            formElement.reset();
             toast.success("Message sent successfully! ✅", {
               position: "top-right",
               autoClose: 3000,

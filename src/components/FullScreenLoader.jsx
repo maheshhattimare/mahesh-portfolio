@@ -1,5 +1,4 @@
-import React from "react";
-import { Loader2, Sparkles } from "lucide-react";
+import { Sparkles } from "lucide-react";
 
 const FullScreenLoader = () => {
   return (
