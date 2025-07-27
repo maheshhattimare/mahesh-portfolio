@@ -5,7 +5,7 @@ import { Routes, Route } from "react-router-dom";
 import { fetchAllPortfolioData } from "./services/publicDataService.js";
 
 import AppLayout from "./components/Layout/AppLayout";
-import FullScreenLoader from "./components/FullScreenLoader";
+import FullScreenLoader from "./components/Common/FullScreenLoader.jsx";
 import HomePage from "./pages/HomePage";
 import ProjectsPage from "./pages/ProjectsPage";
 

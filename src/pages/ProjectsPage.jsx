@@ -8,14 +8,10 @@ import {
   Eye,
   Star,
   Search,
-  Filter,
   Grid3X3,
   List,
   Calendar,
   Tag,
-  ChevronDown,
-  SortAsc,
-  SortDesc,
 } from "lucide-react";
 
 const ProjectsPage = ({ projects = [] }) => {
@@ -23,14 +19,15 @@ const ProjectsPage = ({ projects = [] }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [sortBy, setSortBy] = useState("date");
-  const [sortOrder, setSortOrder] = useState("desc");
   const [viewMode, setViewMode] = useState("grid");
-  const [showFilters, setShowFilters] = useState(false);
 
   //All Category
   const categories = useMemo(() => {
-    const cats = projects.map((project) => project.category).filter(Boolean);
-    return ["All", ...new Set(cats)];
+    const allCategories = projects.flatMap((project) =>
+      (project.category || []).map((cat) => cat.trim().toUpperCase())
+    );
+    const uniqueCategories = Array.from(new Set(allCategories));
+    return ["All", ...uniqueCategories];
   }, [projects]);
 
   // Filter and sort projects
@@ -44,7 +41,10 @@ const ProjectsPage = ({ projects = [] }) => {
         );
 
       const matchesCategory =
-        selectedCategory === "All" || project.category === selectedCategory;
+        selectedCategory === "All" ||
+        (project.category || [])
+          .map((cat) => cat.trim().toUpperCase())
+          .includes(selectedCategory.toUpperCase());
 
       return matchesSearch && matchesCategory;
     });
@@ -66,12 +66,10 @@ const ProjectsPage = ({ projects = [] }) => {
         default:
           comparison = 0;
       }
-
-      return sortOrder === "asc" ? comparison : -comparison;
     });
 
     return filtered;
-  }, [projects, searchTerm, selectedCategory, sortBy, sortOrder]);
+  }, [projects, searchTerm, selectedCategory, sortBy]);
 
   const handleOpenModal = (project) => setSelectedProject(project);
   const handleCloseModal = () => setSelectedProject(null);
@@ -88,10 +86,6 @@ const ProjectsPage = ({ projects = [] }) => {
     return dateStr;
   };
 
-  const toggleSortOrder = () => {
-    setSortOrder((prev) => (prev === "asc" ? "desc" : "asc"));
-  };
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 dark:from-gray-900 dark:via-[#050414] dark:to-purple-900/20 relative overflow-hidden">
       <div className="absolute inset-0 bg-[linear-gradient(to_right,#f0f9ff_1px,transparent_1px),linear-gradient(to_bottom,#f0f9ff_1px,transparent_1px)] dark:bg-[linear-gradient(to_right,#1e1b4b_1px,transparent_1px),linear-gradient(to_bottom,#1e1b4b_1px,transparent_1px)] bg-[size:50px_50px] opacity-20"></div>
@@ -100,7 +94,7 @@ const ProjectsPage = ({ projects = [] }) => {
         <div className="max-w-7xl mx-auto">
           {/* Header */}
           <div className="text-center mb-12 lg:mb-16">
-            <div className="inline-flex items-center gap-2 mb-4">
+            <div className="inline-flex items-center gap-2 mb-4 mt-5">
               <Folder className="w-8 h-8 text-blue-600 dark:text-[#8245ec]" />
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 dark:text-white">
                 ALL PROJECTS
@@ -132,16 +126,16 @@ const ProjectsPage = ({ projects = [] }) => {
 
           {/* Search and Filter Bar */}
           <div className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl rounded-3xl shadow-lg dark:shadow-[0_0_30px_rgba(130,69,236,0.1)] p-6 mb-8 border border-gray-200 dark:border-gray-800/50">
-            <div className="flex flex-col lg:flex-row gap-4 items-center">
+            <div className="flex flex-row gap-4 items-center">
               {/* Search Input */}
               <div className="relative flex-1 w-full lg:w-auto">
                 <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                 <input
                   type="text"
-                  placeholder="Search projects, technologies..."
+                  placeholder="Search projects..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-12 pr-4 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-[#8245ec] text-gray-900 dark:text-white"
+                  className="w-full pl-10 pr-4 py-2 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-[#8245ec] text-sm text-gray-900 dark:text-white"
                 />
               </div>
 
@@ -168,89 +162,32 @@ const ProjectsPage = ({ projects = [] }) => {
                   <List className="w-5 h-5" />
                 </button>
               </div>
-
-              {/* Filters Toggle */}
-              <button
-                onClick={() => setShowFilters(!showFilters)}
-                className="flex items-center gap-2 px-4 py-3 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-2xl transition-all duration-200 text-gray-700 dark:text-gray-300"
-              >
-                <Filter className="w-5 h-5" />
-                Filters
-                <ChevronDown
-                  className={`w-4 h-4 transition-transform duration-200 ${
-                    showFilters ? "rotate-180" : ""
-                  }`}
-                />
-              </button>
             </div>
-
-            {/* Filter Options */}
-            {showFilters && (
-              <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
-                <div className="flex flex-col lg:flex-row gap-4">
-                  {/* Sort Options */}
-                  <div className="flex items-center gap-4">
-                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                      Sort by:
-                    </label>
-                    <select
-                      value={sortBy}
-                      onChange={(e) => setSortBy(e.target.value)}
-                      className="px-3 py-2 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-[#8245ec]"
-                    >
-                      <option value="date">Date</option>
-                      <option value="name">Name</option>
-                      <option value="featured">Featured</option>
-                    </select>
-                    <button
-                      onClick={toggleSortOrder}
-                      className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-xl transition-colors duration-200"
-                    >
-                      {sortOrder === "asc" ? (
-                        <SortAsc className="w-4 h-4 text-gray-600 dark:text-gray-400" />
-                      ) : (
-                        <SortDesc className="w-4 h-4 text-gray-600 dark:text-gray-400" />
-                      )}
-                    </button>
-                  </div>
-
-                  {/* Results Count */}
-                  <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
-                    <span>
-                      {filteredProjects.length} project
-                      {filteredProjects.length !== 1 ? "s" : ""} found
-                    </span>
-                  </div>
-                </div>
-              </div>
-            )}
           </div>
 
           {/* Category Tabs */}
-          <div className="mb-8">
-            <div className="flex flex-wrap gap-2 justify-center">
+          <div className="mb-8 overflow-x-auto">
+            <div className="flex gap-3 pb-2 px-2 sm:px-4 whitespace-nowrap overflow-x-auto scrollbar-thin scrollbar-thumb-blue-300 dark:scrollbar-thumb-[#8245ec]/60 scrollbar-track-transparent">
               {categories.map((category) => (
                 <button
                   key={category}
                   onClick={() => setSelectedCategory(category)}
-                  className={`px-6 py-3 rounded-2xl font-semibold transition-all duration-300 ${
+                  className={`flex-shrink-0 px-5 py-2.5 rounded-full font-medium transition-all duration-300 text-sm ${
                     selectedCategory === category
-                      ? "bg-gradient-to-r from-blue-600 to-purple-600 dark:from-[#8245ec] dark:to-purple-400 text-white shadow-lg"
+                      ? "bg-gradient-to-r from-blue-600 to-purple-600 dark:from-[#8245ec] dark:to-purple-400 text-white shadow"
                       : "bg-white dark:bg-gray-900/80 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 border border-gray-200 dark:border-gray-800"
                   }`}
                 >
-                  <div className="flex items-center gap-2">
-                    <Tag className="w-4 h-4" />
-                    {category}
-                    <span className="text-xs opacity-75">
-                      (
-                      {category === "All"
-                        ? projects.length
-                        : projects.filter((p) => p.category === category)
-                            .length}
-                      )
-                    </span>
-                  </div>
+                  {category}
+                  <span className="ml-1 text-xs opacity-60">
+                    (
+                    {category === "All"
+                      ? projects.length
+                      : projects.filter((p) =>
+                          (p.category || []).includes(category)
+                        ).length}
+                    )
+                  </span>
                 </button>
               ))}
             </div>
@@ -274,17 +211,20 @@ const ProjectsPage = ({ projects = [] }) => {
                         className="w-full h-48 sm:h-52 object-cover transition-transform duration-700 group-hover:scale-110"
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                      <div className="absolute top-4 left-4 flex gap-2">
+                      <div className="absolute top-4 left-4 flex gap-2 text-center items-center">
                         {project.isFeatured && (
                           <div className="bg-yellow-100 dark:bg-yellow-900/40 text-yellow-800 dark:text-yellow-300 p-2 rounded-full shadow">
                             <Star className="w-4 h-4" />
                           </div>
                         )}
-                        {project.category && (
-                          <div className="bg-blue-100 dark:bg-[#8245ec]/20 text-blue-800 dark:text-[#8245ec] px-3 py-1 rounded-full text-xs font-medium">
-                            {project.category}
+                        {(project.category || []).map((item, index) => (
+                          <div
+                            key={index}
+                            className="bg-blue-100 dark:bg-[#8245ec]/20 text-blue-800 dark:text-[#8245ec] px-3 py-1 rounded-full text-xs font-medium"
+                          >
+                            {item}
                           </div>
-                        )}
+                        ))}
                       </div>
                       <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-x-4 group-hover:translate-x-0">
                         <div className="bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm rounded-full p-2">
@@ -356,11 +296,14 @@ const ProjectsPage = ({ projects = [] }) => {
                           {project.isFeatured && (
                             <Star className="w-5 h-5 text-yellow-500" />
                           )}
-                          {project.category && (
-                            <span className="bg-blue-100 dark:bg-[#8245ec]/20 text-blue-800 dark:text-[#8245ec] px-2 py-1 rounded-lg text-xs font-medium">
-                              {project.category}
+                          {(project.category || []).map((item, index) => (
+                            <span
+                              key={index}
+                              className="bg-blue-100 dark:bg-[#8245ec]/20 text-blue-800 dark:text-[#8245ec] px-2 py-1 rounded-lg text-xs font-medium "
+                            >
+                              {item}
                             </span>
-                          )}
+                          ))}
                         </div>
                       </div>
                       <p className="text-gray-600 dark:text-gray-400 line-clamp-2">
@@ -453,11 +396,14 @@ const ProjectsPage = ({ projects = [] }) => {
                             <Star className="w-5 h-5" />
                           </div>
                         )}
-                        {selectedProject.category && (
-                          <span className="bg-blue-100 dark:bg-[#8245ec]/20 text-blue-800 dark:text-[#8245ec] px-3 py-2 rounded-full text-sm font-medium">
-                            {selectedProject.category}
+                        {(selectedProject.category || []).map((item, index) => (
+                          <span
+                            key={index}
+                            className="bg-blue-100 dark:bg-[#8245ec]/20 text-blue-800 dark:text-[#8245ec] px-3 py-2 rounded-full text-sm font-medium"
+                          >
+                            {item}
                           </span>
-                        )}
+                        ))}
                       </div>
                     </div>
 
@@ -501,7 +447,15 @@ const ProjectsPage = ({ projects = [] }) => {
                           </h4>
                           <p className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-2">
                             <Tag className="w-4 h-4" />
-                            {selectedProject.category}
+                            {selectedProject.category.map((item, index) => (
+                              <span
+                                key={index}
+                                className="bg-gray-100 px-2 py-[2px] rounded-lg"
+                              >
+                                {item}
+                              </span>
+                            ))}
+                            {/* {selectedProject.category} */}
                           </p>
                         </div>
                       )}

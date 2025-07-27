@@ -70,7 +70,8 @@ const WorkSection = ({ projects }) => {
           </div>
 
           <p className="text-gray-600 dark:text-gray-400 text-lg lg:text-xl font-medium max-w-3xl mx-auto leading-relaxed">
-            A showcase of selected featured projects highlighting my skills and experience.
+            A showcase of selected featured projects highlighting my skills and
+            experience.
           </p>
         </div>
 
@@ -126,7 +127,8 @@ const WorkSection = ({ projects }) => {
                 </div>
 
                 <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
-                  {formatDate(project.startDate)} — {formatDate(project.endDate)}
+                  {formatDate(project.startDate)} —{" "}
+                  {formatDate(project.endDate)}
                 </p>
               </div>
             </div>
