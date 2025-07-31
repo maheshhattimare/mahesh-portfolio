@@ -42,6 +42,8 @@ const Navbar = ({ socials, about }) => {
     }
   };
 
+  console.log(socials);
+
   return (
     <nav
       className={`fixed top-0 w-full z-50 transition-all duration-300 px-4 sm:px-8 md:px-12 lg:px-20 xl:px-32 ${
@@ -126,8 +128,10 @@ const Navbar = ({ socials, about }) => {
 
           <div className="flex space-x-3">
             {(socials?.data || [])
-              .filter((social) =>
-                ["github", "linkedin"].includes(social.name.toLowerCase())
+              .filter(
+                (social) =>
+                  social.isActive &&
+                  ["github", "linkedin"].includes(social.name.toLowerCase())
               )
               .map((social, index) => {
                 const Icon = iconMap[social.icon] || FaGlobe;
@@ -220,9 +224,18 @@ const Navbar = ({ socials, about }) => {
             ))}
             <div className="flex space-x-6 pt-4 border-t border-gray-200 dark:border-gray-700 mt-4 w-full justify-center">
               {(socials?.data || [])
-                .filter((social) =>
-                  ["github", "linkedin"].includes(social.name.toLowerCase())
-                )
+                .filter((social) => {
+                  console.log(
+                    "Checking social:",
+                    social.name,
+                    "isActive:",
+                    social.isActive
+                  );
+                  return (
+                    social.isActive &&
+                    ["github", "linkedin"].includes(social.name.toLowerCase())
+                  );
+                })
                 .map((social, index) => {
                   const Icon = iconMap[social.icon] || FaGlobe;
                   return (

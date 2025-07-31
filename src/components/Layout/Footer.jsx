@@ -42,35 +42,39 @@ const Footer = ({ socials, about }) => {
 
           {/* Navigation links using social names */}
           <nav className="flex flex-wrap justify-center gap-4 sm:gap-6">
-            {socials?.data.map((social, index) => (
-              <button
-                key={social._id || index}
-                onClick={() => handleScroll(social.name.toLowerCase())}
-                className="text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-[#8245ec] text-sm sm:text-base font-medium transition-colors duration-200 py-2 px-1 relative group"
-              >
-                {social.name}
-                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-blue-600 dark:bg-[#8245ec] group-hover:w-full transition-all duration-300"></span>
-              </button>
-            ))}
+            {socials?.data
+              .filter((social) => social.isActive)
+              .map((social, index) => (
+                <button
+                  key={social._id || index}
+                  onClick={() => handleScroll(social.name.toLowerCase())}
+                  className="text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-[#8245ec] text-sm sm:text-base font-medium transition-colors duration-200 py-2 px-1 relative group"
+                >
+                  {social.name}
+                  <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-blue-600 dark:bg-[#8245ec] group-hover:w-full transition-all duration-300"></span>
+                </button>
+              ))}
           </nav>
 
           {/* Social Icons */}
           <div className="flex justify-center gap-4 sm:gap-6">
-            {socials?.data.map((social, index) => {
-              const Icon = iconMap[social.icon] || FaGlobe;
-              return (
-                <a
-                  key={social._id || index}
-                  href={social.link}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="group bg-white dark:bg-gray-800 hover:bg-blue-50 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-[#8245ec] p-3 rounded-full border border-gray-200 dark:border-gray-700 shadow-md hover:shadow-lg transition-all duration-300 hover:-translate-y-1 hover:scale-110"
-                  aria-label={social.name}
-                >
-                  <Icon size={20} className="group-hover:animate-pulse" />
-                </a>
-              );
-            })}
+            {socials?.data
+              .filter((social) => social.isActive)
+              .map((social, index) => {
+                const Icon = iconMap[social.icon] || FaGlobe;
+                return (
+                  <a
+                    key={social._id || index}
+                    href={social.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group bg-white dark:bg-gray-800 hover:bg-blue-50 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-[#8245ec] p-3 rounded-full border border-gray-200 dark:border-gray-700 shadow-md hover:shadow-lg transition-all duration-300 hover:-translate-y-1 hover:scale-110"
+                    aria-label={social.name}
+                  >
+                    <Icon size={20} className="group-hover:animate-pulse" />
+                  </a>
+                );
+              })}
           </div>
 
           {/* Divider */}
